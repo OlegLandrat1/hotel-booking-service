@@ -1,0 +1,68 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: booking-service
+
+  datasource:
+    url: jdbc:h2:mem:bookingdb;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    show-sql: false
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          public-key-location: classpath:keys/jwt-public.pem
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+app:
+  jwt:
+    issuer: hotel-booking-service
+    expiration: PT1H
+    private-key-location: file:${JWT_PRIVATE_KEY_PATH:./secrets/booking-private.pem}
+
+  hotel:
+    service-name: hotel-service
+    connect-timeout: 2s
+    read-timeout: 3s
+    retry:
+      max-attempts: 3
+      initial-backoff: 500ms
+      multiplier: 2.0
+
+  bootstrap-admin:
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD}
+
+logging:
+  level:
+    root: INFO
+    com.example.hotel.booking: DEBUG
+  pattern:
+    level: "%5p [bookingId=%X{bookingId:-}]"
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

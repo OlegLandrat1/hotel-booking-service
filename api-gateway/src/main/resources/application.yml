@@ -1,0 +1,55 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          httpclient:
+            connect-timeout: 2000
+            response-timeout: 5s
+          routes:
+            - id: blocked-internal-hotel
+              uri: no://op
+              order: 0
+              predicates:
+                - Path=/api/rooms/{id}/confirm-availability,/api/rooms/{id}/release
+              filters:
+                - SetStatus=404
+
+            - id: booking-service
+              uri: lb://booking-service
+              order: 1
+              predicates:
+                - Path=/api/bookings/**,/api/booking/**,/api/user/**
+              filters:
+                - StripPrefix=1
+
+            - id: hotel-service
+              uri: lb://hotel-service
+              order: 1
+              predicates:
+                - Path=/api/hotels/**,/api/rooms/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: INFO
+    com.example.hotel.gateway: DEBUG
