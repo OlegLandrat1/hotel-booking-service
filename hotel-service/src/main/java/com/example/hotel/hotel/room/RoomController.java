@@ -21,7 +21,7 @@ public class RoomController {
     }
 
     @GetMapping("/recommend")
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN','SERVICE')")
     public List<Item> recommend(
             @RequestParam("arrival") final LocalDate arrival,
             @RequestParam("departure") final LocalDate departure
