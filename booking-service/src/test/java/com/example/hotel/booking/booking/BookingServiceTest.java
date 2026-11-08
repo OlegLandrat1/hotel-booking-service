@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
  * Полный цикл бронирования с подменённым Hotel Service: успех, сбой, перебор номеров,
  * отмена и повторная доставка запроса.
  */
-@SpringBootTest(properties = "eureka.client.enabled=false")
+@SpringBootTest(properties = {"eureka.client.enabled=false", "app.bootstrap-admin.password=test-admin"})
 class BookingServiceTest {
 
     private static final LocalDate ARRIVAL = LocalDate.of(2026, 12, 1);
