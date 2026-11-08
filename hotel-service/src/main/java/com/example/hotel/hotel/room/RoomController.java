@@ -12,7 +12,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/rooms")
-public final class RoomController {
+public class RoomController {
 
     private final RoomCatalog catalog;
 
@@ -21,7 +21,7 @@ public final class RoomController {
     }
 
     @GetMapping("/recommend")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public List<Item> recommend(
             @RequestParam("arrival") final LocalDate arrival,
             @RequestParam("departure") final LocalDate departure

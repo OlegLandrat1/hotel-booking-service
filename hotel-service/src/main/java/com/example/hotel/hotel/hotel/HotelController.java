@@ -11,7 +11,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/hotels")
-public final class HotelController {
+public class HotelController {
 
     private final HotelRepository hotels;
 
@@ -20,7 +20,7 @@ public final class HotelController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     public List<Item> list() {
         return this.hotels.findAll().stream().map(Item::new).toList();
     }
