@@ -5,6 +5,7 @@ import com.example.hotel.booking.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -147,5 +148,15 @@ public class BookingLedger {
      * @param from Прежнее состояние
      */
     public record Moved(Booking booking, BookingStatus from) {
+    }
+
+    /**
+     * PENDING-бронирования, созданные раньше порога.
+     * @param before Порог по времени создания
+     * @return Зависшие бронирования
+     */
+    @Transactional(readOnly = true)
+    public List<Booking> stalePending(final Instant before) {
+        return this.bookings.findByStatusAndCreatedAtBefore(BookingStatus.PENDING, before);
     }
 }

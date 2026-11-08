@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +37,14 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * @return Бронирования
      */
     List<Booking> findByUserIdOrderByCreatedAtDesc(Long userId);
+
+    /**
+     * Бронирования в состоянии, созданные раньше порога.
+     * @param status Состояние
+     * @param before Порог по времени создания
+     * @return Найденные бронирования
+     */
+    List<Booking> findByStatusAndCreatedAtBefore(BookingStatus status, Instant before);
 
     /**
      * Бронирование с блокировкой строки на время транзакции.

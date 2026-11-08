@@ -13,9 +13,9 @@ target/
 *.iml
 *.ipr
 *.pem
-secrets/
 !**/src/main/resources/keys/*.pem
-
+!**/src/test/resources/test-keys/*.pem
+secrets/
 *.key
 .env
 

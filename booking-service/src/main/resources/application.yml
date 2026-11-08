@@ -54,6 +54,10 @@ app:
     username: ${ADMIN_USERNAME:admin}
     password: ${ADMIN_PASSWORD}
 
+  recovery:
+    stale-after: PT10M
+    interval: PT1M
+
 logging:
   level:
     root: INFO

@@ -60,4 +60,13 @@ public class RoomController {
      */
     public record Form(Long hotel, String number) {
     }
+
+    @GetMapping
+    @PreAuthorize("hasRole('USER')")
+    public List<Item> list(
+            @RequestParam("arrival") final LocalDate arrival,
+            @RequestParam("departure") final LocalDate departure
+    ) {
+        return this.catalog.freeUnsorted(arrival, departure).stream().map(Item::new).toList();
+    }
 }

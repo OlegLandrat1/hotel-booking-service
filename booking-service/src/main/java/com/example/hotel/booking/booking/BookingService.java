@@ -10,6 +10,7 @@ import org.slf4j.MDC;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -174,4 +175,42 @@ public class BookingService {
     private static String holdKey(final Long id, final Long room) {
         return "booking-" + id + "-room-" + room;
     }
+
+    /**
+     * Доводит зависшие PENDING-бронирования до CONFIRMED или CANCELLED.
+     * Одно сбойное бронирование не останавливает остальные.
+     * @param before Порог по времени создания
+     */
+    public void recoverStale(final Instant before) {
+        for (final Booking stale : this.ledger.stalePending(before)) {
+            try {
+                this.recover(stale);
+            } catch (final RuntimeException ex) {
+                LOG.error("stale recovery failed bookingId={}", stale.id(), ex);
+            }
+        }
+    }
+
+    private void recover(final Booking stale) {
+        final Long id = stale.id();
+        final Long room = stale.roomId();
+        final String key = holdKey(id, room);
+        try (MDC.MDCCloseable ignored = MDC.putCloseable("bookingId", String.valueOf(id))) {
+            LOG.info("stale PENDING found, retrying confirm room={} key={}", room, key);
+            try {
+                this.hotel.confirm(room, stale.arrival(), stale.departure(), key);
+            } catch (final RoomUnavailable busy) {
+                LOG.info("hotel refused stale PENDING, PENDING -> CANCELLED");
+                this.ledger.cancel(id);
+                return;
+            } catch (final HotelFailure failure) {
+                LOG.error("hotel still unavailable, compensating room={} key={}", room, key, failure);
+                this.compensate(id, room, key);
+                return;
+            }
+            this.ledger.confirm(id);
+            LOG.info("stale PENDING -> CONFIRMED room={} key={}", room, key);
+        }
+    }
+
 }

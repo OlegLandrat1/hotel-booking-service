@@ -50,4 +50,14 @@ public final class RoomCatalog {
     public List<Room> free(final LocalDate arrival, final LocalDate departure) {
         return this.rooms.findFree(arrival, departure, Sort.by("times", "id"));
     }
+
+    /**
+     * Свободные на период номера без сортировки.
+     * @param arrival Дата заезда
+     * @param departure Дата выезда
+     * @return Номера в порядке хранения
+     */
+    public List<Room> freeUnsorted(final LocalDate arrival, final LocalDate departure) {
+        return this.rooms.findFree(arrival, departure, Sort.unsorted());
+    }
 }
